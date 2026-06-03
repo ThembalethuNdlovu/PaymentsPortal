@@ -1,0 +1,42 @@
+{
+  "name": "paymentsportal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThembalethuNdlovu/PaymentsPortal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ThembalethuNdlovu/PaymentsPortal/issues"
+  },
+  "homepage": "https://github.com/ThembalethuNdlovu/PaymentsPortal#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
+    "express-brute": "^1.0.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.5.2",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.2.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.6.3",
+    "morgan": "^1.11.0",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "nodemon": "^3.1.14"
+  }
+}
