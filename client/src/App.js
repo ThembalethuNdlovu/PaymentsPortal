@@ -1,24 +1,24 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import CustomerLogin from './pages/CustomerLogin';
+import CustomerRegister from './pages/CustomerRegister';
+import CustomerDashboard from './pages/CustomerDashboard';
+import EmployeeLogin from './pages/EmployeeLogin';
+import EmployeePortal from './pages/EmployeePortal';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/customer/login" />} />
+        <Route path="/customer/login" element={<CustomerLogin />} />
+        <Route path="/customer/register" element={<CustomerRegister />} />
+        <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+        <Route path="/employee/login" element={<EmployeeLogin />} />
+        <Route path="/employee/portal" element={<EmployeePortal />} />
+      </Routes>
+    </Router>
   );
 }
 

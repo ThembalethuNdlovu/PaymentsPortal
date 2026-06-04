@@ -14,6 +14,9 @@ require('dotenv').config({ path: './server/.env' });
 
 const app = express();
 
+// Trust proxy for rate limiting
+app.set('trust proxy', 1);
+
 // ─── Security Middleware ───────────────────────────────────────
 // Helmet sets secure HTTP headers
 app.use(helmet());

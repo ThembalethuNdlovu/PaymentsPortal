@@ -78,10 +78,14 @@ router.post('/register', registerValidation, async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, accountNumber: user.accountNumber },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+  {
+    id: user._id,
+    fullName: user.fullName,
+    accountNumber: user.accountNumber
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: '1h' }
+);
 
     res.status(201).json({
       message: 'Registration successful',
@@ -134,10 +138,14 @@ router.post('/login', loginValidation, async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, accountNumber: user.accountNumber },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+  {
+    id: user._id,
+    fullName: user.fullName,
+    accountNumber: user.accountNumber
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: '1h' }
+);
 
     res.status(200).json({
       message: 'Login successful',
