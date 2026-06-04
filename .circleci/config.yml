@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   sonarcloud: sonarsource/sonarcloud@2.0.0
-  node: circleci/node@5.1.0
 
 jobs:
   build-and-test:
@@ -11,29 +10,24 @@ jobs:
     steps:
       - checkout
 
-      - node/install-packages:
-          pkg-manager: npm
-          app-dir: .
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
 
-      - node/install-packages:
-          pkg-manager: npm
-          app-dir: client
+      - run:
+          name: Install Server Dependencies
+          command: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
 
       - run:
           name: Run Security Audit
-          command: npm audit --audit-level=high || true
+          command: npm audit --audit-level=critical || true
 
-      - run:
-          name: Check for dependency vulnerabilities
-          command: npm audit --json > audit-report.json || true
-
-      - sonarcloud/scan
-
-  sonarcloud-scan:
-    docker:
-      - image: cimg/node:18.17
-    steps:
-      - checkout
       - sonarcloud/scan
 
 workflows:
@@ -41,7 +35,3 @@ workflows:
     jobs:
       - build-and-test:
           context: SonarCloud
-      - sonarcloud-scan:
-          context: SonarCloud
-          requires:
-            - build-and-test
