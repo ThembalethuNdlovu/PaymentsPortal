@@ -3,23 +3,30 @@ const bcrypt = require('bcryptjs');
 const Employee = require('./models/Employee');
 require('dotenv').config({ path: './server/.env' });
 
+const employeePassword = process.env.EMPLOYEE_PASSWORD;
+
+if (!employeePassword) {
+  console.error('❌ EMPLOYEE_PASSWORD not set in .env file');
+  process.exit(1);
+}
+
 const employees = [
   {
     fullName: 'John Smith',
     username: 'john_smith',
-    password: process.env.EMPLOYEE_PASSWORD || 'Employee@123',
+    password: employeePassword,
     role: 'admin'
   },
   {
     fullName: 'Sarah Johnson',
     username: 'sarah_johnson',
-    password: process.env.EMPLOYEE_PASSWORD || 'Employee@123',
+    password: employeePassword,
     role: 'employee'
   },
   {
     fullName: 'Michael Brown',
     username: 'michael_brown',
-    password: process.env.EMPLOYEE_PASSWORD || 'Employee@123',
+    password: employeePassword,
     role: 'employee'
   }
 ];
