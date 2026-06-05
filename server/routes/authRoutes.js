@@ -130,7 +130,8 @@ router.post('/login', bruteforce.prevent, loginValidation, async (req, res) => {
 
   try {
     // Find user by account number
-    const user = await User.findOne({ accountNumber });
+    const sanitizedAccountNumber = accountNumber.replace(/[^0-9]/g, '');
+    const user = await User.findOne({ accountNumber: sanitizedAccountNumber });
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });

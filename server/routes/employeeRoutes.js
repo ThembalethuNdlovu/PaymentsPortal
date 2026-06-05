@@ -43,7 +43,8 @@ router.post('/login', bruteforce.prevent, loginValidation, async (req, res) => {
 
   try {
     // Find employee by username
-    const employee = await Employee.findOne({ username });
+    const sanitizedUsername = username.replace(/[^a-zA-Z0-9_]/g, '');
+    const employee = await Employee.findOne({ username: sanitizedUsername });
 
     if (!employee) {
       return res.status(401).json({ message: 'Invalid credentials' });

@@ -7,19 +7,19 @@ const employees = [
   {
     fullName: 'John Smith',
     username: 'john_smith',
-    password: 'Employee@123',
+    password: process.env.EMPLOYEE_PASSWORD || 'Employee@123',
     role: 'admin'
   },
   {
     fullName: 'Sarah Johnson',
     username: 'sarah_johnson',
-    password: 'Employee@123',
+    password: process.env.EMPLOYEE_PASSWORD || 'Employee@123',
     role: 'employee'
   },
   {
     fullName: 'Michael Brown',
     username: 'michael_brown',
-    password: 'Employee@123',
+    password: process.env.EMPLOYEE_PASSWORD || 'Employee@123',
     role: 'employee'
   }
 ];
