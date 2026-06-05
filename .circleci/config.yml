@@ -7,6 +7,9 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:18.17
+    environment:
+      SONAR_ORGANIZATION: thembalethundlovu
+      SONAR_PROJECT_KEY: ThembalethuNdlovu_PaymentsPortal
     steps:
       - checkout
 
@@ -28,7 +31,8 @@ jobs:
           name: Run Security Audit
           command: npm audit --audit-level=critical || true
 
-      - sonarcloud/scan
+      - sonarcloud/scan:
+          sonar_token_variable_name: SONAR_TOKEN
 
 workflows:
   build-test-scan:
