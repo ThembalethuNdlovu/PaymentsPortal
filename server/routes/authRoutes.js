@@ -4,6 +4,20 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const ExpressBrute = require('express-brute');
+
+// ─── Brute Force Protection ───────────────────────────────────
+const store = new ExpressBrute.MemoryStore();
+const bruteforce = new ExpressBrute(store, {
+  freeRetries: 5,
+  minWait: 5 * 60 * 1000,    // 5 minutes
+  maxWait: 60 * 60 * 1000,   // 1 hour
+  failCallback: (req, res, next, nextValidRequestDate) => {
+    res.status(429).json({
+      message: `Too many failed attempts. Try again after ${nextValidRequestDate}`
+    });
+  }
+});
 
 // ─── Input Validation Rules ───────────────────────────────────
 const registerValidation = [
@@ -47,7 +61,7 @@ const loginValidation = [
 
 // ─── Register Route ───────────────────────────────────────────
 // POST /api/auth/register
-router.post('/register', registerValidation, async (req, res) => {
+router.post('/register', bruteforce.prevent, registerValidation, async (req, res) => {
   // Check validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -105,7 +119,7 @@ router.post('/register', registerValidation, async (req, res) => {
 
 // ─── Login Route ──────────────────────────────────────────────
 // POST /api/auth/login
-router.post('/login', loginValidation, async (req, res) => {
+router.post('/login', bruteforce.prevent, loginValidation, async (req, res) => {
   // Check validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

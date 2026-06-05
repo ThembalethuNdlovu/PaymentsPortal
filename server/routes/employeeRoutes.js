@@ -3,6 +3,20 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const Employee = require('../models/Employee');
+const ExpressBrute = require('express-brute');
+
+// ─── Brute Force Protection ───────────────────────────────────
+const store = new ExpressBrute.MemoryStore();
+const bruteforce = new ExpressBrute(store, {
+  freeRetries: 5,
+  minWait: 5 * 60 * 1000,
+  maxWait: 60 * 60 * 1000,
+  failCallback: (req, res, next, nextValidRequestDate) => {
+    res.status(429).json({
+      message: `Too many failed attempts. Try again after ${nextValidRequestDate}`
+    });
+  }
+});
 
 // ─── Input Validation Rules ───────────────────────────────────
 const loginValidation = [
@@ -19,7 +33,7 @@ const loginValidation = [
 
 // ─── Employee Login ───────────────────────────────────────────
 // POST /api/employee/login
-router.post('/login', loginValidation, async (req, res) => {
+router.post('/login', bruteforce.prevent, loginValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
