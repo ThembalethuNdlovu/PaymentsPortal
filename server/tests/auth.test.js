@@ -459,6 +459,65 @@ describe('Transaction Routes', () => {
     expect(res.statusCode).toBe(404);
   });
 
+  describe('Error Handling', () => {
+
+  it('should handle missing password on customer login', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({
+        username: 'TestUserOne',
+        accountNumber: '12345678901'
+      });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should handle missing password on employee login', async () => {
+    const res = await request(app)
+      .post('/api/employee/login')
+      .send({
+        username: 'test_employee'
+      });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should handle invalid token on transactions', async () => {
+    const res = await request(app)
+      .get('/api/transactions')
+      .set('Authorization', 'Bearer invalidtoken123');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should handle invalid token on verify', async () => {
+    const res = await request(app)
+      .patch('/api/transactions/000000000000000000000000/verify')
+      .set('Authorization', 'Bearer invalidtoken123');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should handle invalid token on submit', async () => {
+    const res = await request(app)
+      .patch('/api/transactions/000000000000000000000000/submit')
+      .set('Authorization', 'Bearer invalidtoken123');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should not submit non existent transaction', async () => {
+    const empRes = await request(app)
+      .post('/api/employee/login')
+      .send({
+        username: 'test_employee',
+        password: 'Employee@123'
+      });
+    const token = empRes.body.token;
+
+    const res = await request(app)
+      .patch('/api/transactions/000000000000000000000000/submit')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toBe(404);
+  });
+
+});
+
 });
 });
 
