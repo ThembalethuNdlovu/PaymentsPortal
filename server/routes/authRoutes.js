@@ -6,12 +6,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const ExpressBrute = require('express-brute');
 
-// ─── Brute Force Protection ───────────────────────────────────
 const store = new ExpressBrute.MemoryStore();
 const bruteforce = new ExpressBrute(store, {
-  freeRetries: 5,
-  minWait: 5 * 60 * 1000,    // 5 minutes
-  maxWait: 60 * 60 * 1000,   // 1 hour
+  freeRetries: process.env.NODE_ENV === 'test' ? 1000 : 5,
+  minWait: process.env.NODE_ENV === 'test' ? 0 : 5 * 60 * 1000,
+  maxWait: process.env.NODE_ENV === 'test' ? 0 : 60 * 60 * 1000,
   failCallback: (req, res, next, nextValidRequestDate) => {
     res.status(429).json({
       message: `Too many failed attempts. Try again after ${nextValidRequestDate}`

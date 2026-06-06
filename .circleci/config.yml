@@ -31,6 +31,16 @@ jobs:
           name: Run Security Audit
           command: npm audit --audit-level=critical || true
 
+      - run:
+          name: Run Tests with Coverage
+          command: npm run test:ci
+          environment:
+            MONGO_URI: mongodb://localhost:27017/paymentsportal_test
+            JWT_SECRET: test_jwt_secret
+            JWT_EMPLOYEE_SECRET: test_employee_jwt_secret
+            NODE_ENV: test
+            EMPLOYEE_PASSWORD: Employee@123
+
       - sonarcloud/scan:
           sonar_token_variable_name: SONAR_TOKEN
 

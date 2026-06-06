@@ -4,12 +4,26 @@
   "description": "Secure International Payments Portal - APDS7311",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
-    "client": "npm start --prefix client",
-    "dev:full": "concurrently \"npm run dev\" \"npm run client\"",
-    "seed": "node server/seed.js"
-  },
+  "start": "node server/index.js",
+  "dev": "nodemon server/index.js",
+  "client": "npm start --prefix client",
+  "dev:full": "concurrently \"npm run dev\" \"npm run client\"",
+  "seed": "node server/seed.js",
+  "test": "jest --coverage --forceExit",
+  "test:ci": "jest --coverage --forceExit --ci"
+},
+"jest": {
+  "testEnvironment": "node",
+  "coverageDirectory": "coverage",
+  "collectCoverageFrom": [
+    "server/**/*.js",
+    "!server/seed.js",
+    "!server/config/**"
+  ],
+  "testMatch": [
+    "**/tests/**/*.test.js"
+  ]
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ThembalethuNdlovu/PaymentsPortal.git"
@@ -40,6 +54,9 @@
   },
   "devDependencies": {
     "concurrently": "^10.0.3",
-    "nodemon": "^3.1.14"
+    "cross-env": "^10.1.0",
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
   }
 }
