@@ -7,9 +7,13 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:18.17
+      - image: cimg/mongo:6.0
     environment:
-      SONAR_ORGANIZATION: thembalethundlovu
-      SONAR_PROJECT_KEY: ThembalethuNdlovu_PaymentsPortal
+      MONGO_URI_TEST: mongodb://localhost:27017/paymentsportal_test
+      JWT_SECRET: test_jwt_secret_for_ci
+      JWT_EMPLOYEE_SECRET: test_employee_jwt_secret_for_ci
+      NODE_ENV: test
+      EMPLOYEE_PASSWORD: Employee@123
     steps:
       - checkout
 
@@ -32,14 +36,20 @@ jobs:
           command: npm audit --audit-level=critical || true
 
       - run:
+          name: Wait for MongoDB
+          command: |
+            for i in $(seq 1 10); do
+              if nc -z localhost 27017; then
+                echo "MongoDB is ready!"
+                break
+              fi
+              echo "Waiting for MongoDB... attempt $i"
+              sleep 3
+            done
+
+      - run:
           name: Run Tests with Coverage
           command: npm run test:ci
-          environment:
-            MONGO_URI: mongodb://localhost:27017/paymentsportal_test
-            JWT_SECRET: test_jwt_secret
-            JWT_EMPLOYEE_SECRET: test_employee_jwt_secret
-            NODE_ENV: test
-            EMPLOYEE_PASSWORD: Employee@123
 
       - sonarcloud/scan:
           sonar_token_variable_name: SONAR_TOKEN
