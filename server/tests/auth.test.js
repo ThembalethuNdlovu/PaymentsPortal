@@ -285,4 +285,87 @@ describe('Transaction Routes', () => {
     expect(res.body).toHaveProperty('transactions');
   });
 
+  describe('Transaction Verification', () => {
+
+  let employeeToken;
+  let transactionId;
+  let customerToken2;
+
+  beforeAll(async () => {
+    const empRes = await request(app)
+      .post('/api/employee/login')
+      .send({
+        username: 'test_employee',
+        password: 'Employee@123'
+      });
+    employeeToken = empRes.body.token;
+
+    const regRes = await request(app)
+      .post('/api/auth/register')
+      .send({
+        fullName: 'Verify Tester',
+        idNumber: '7001015800085',
+        accountNumber: '22222222222',
+        password: 'Test@1234'
+      });
+    customerToken2 = regRes.body.token;
+
+    const txRes = await request(app)
+      .post('/api/transactions')
+      .set('Authorization', `Bearer ${customerToken2}`)
+      .send({
+        amount: 1000,
+        currency: 'EUR',
+        provider: 'SWIFT',
+        recipientName: 'Bob Jones',
+        recipientBank: 'Barclays Bank',
+        recipientAccountNumber: '11122233344',
+        swiftCode: 'BARCGB22XXX'
+      });
+    transactionId = txRes.body.transaction?._id;
+  });
+
+  it('should get all transactions as employee', async () => {
+    const res = await request(app)
+      .get('/api/transactions')
+      .set('Authorization', `Bearer ${employeeToken}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty('transactions');
+    expect(Array.isArray(res.body.transactions)).toBe(true);
+  });
+
+  it('should not get transactions without employee token', async () => {
+    const res = await request(app)
+      .get('/api/transactions');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('should verify a transaction', async () => {
+    if (!transactionId) return;
+    const res = await request(app)
+      .patch(`/api/transactions/${transactionId}/verify`)
+      .set('Authorization', `Bearer ${employeeToken}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.transaction.status).toBe('Verified');
+  });
+
+  it('should submit transaction to SWIFT', async () => {
+    if (!transactionId) return;
+    const res = await request(app)
+      .patch(`/api/transactions/${transactionId}/submit`)
+      .set('Authorization', `Bearer ${employeeToken}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.transaction.status).toBe('Submitted');
+  });
+
+  it('should not verify with customer token', async () => {
+    if (!transactionId) return;
+    const res = await request(app)
+      .patch(`/api/transactions/${transactionId}/verify`)
+      .set('Authorization', `Bearer ${customerToken2}`);
+    expect(res.statusCode).toBe(401);
+  });
+
+});
+
 });
