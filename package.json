@@ -18,7 +18,8 @@
   "collectCoverageFrom": [
     "server/**/*.js",
     "!server/seed.js",
-    "!server/config/**"
+    "!server/config/**",
+    "!server/index.js"
   ],
   "testMatch": [
     "**/tests/**/*.test.js"

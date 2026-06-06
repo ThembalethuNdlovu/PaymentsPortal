@@ -16,6 +16,9 @@ app.use(xss());
 app.use('/api/auth', require('../routes/authRoutes'));
 app.use('/api/employee', require('../routes/employeeRoutes'));
 app.use('/api/transactions', require('../routes/transactionRoutes'));
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
 
 // ─── Test Setup ───────────────────────────────────────────────
 beforeAll(async () => {
@@ -365,6 +368,99 @@ describe('Transaction Routes', () => {
       .set('Authorization', `Bearer ${customerToken2}`);
     expect(res.statusCode).toBe(401);
   });
+
+  describe('Health Check', () => {
+  it('should return 200 on health endpoint', async () => {
+    const res = await request(app)
+      .get('/api/health');
+    expect(res.statusCode).toBe(200);
+  });
+
+  describe('Edge Cases', () => {
+
+  it('should not register with invalid full name', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        fullName: '123 Invalid',
+        idNumber: '6001015800085',
+        accountNumber: '33333333333',
+        password: 'Test@1234'
+      });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should not register with short account number', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        fullName: 'Valid Name',
+        idNumber: '6001015800086',
+        accountNumber: '123',
+        password: 'Test@1234'
+      });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should not login with invalid account number format', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({
+        username: 'TestUserOne',
+        accountNumber: 'abc',
+        password: 'Test@1234'
+      });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should not login employee with invalid username format', async () => {
+    const res = await request(app)
+      .post('/api/employee/login')
+      .send({
+        username: '!!invalid!!',
+        password: 'Employee@123'
+      });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should not create transaction with missing fields', async () => {
+    const registerRes = await request(app)
+      .post('/api/auth/register')
+      .send({
+        fullName: 'Edge Tester',
+        idNumber: '5001015800085',
+        accountNumber: '44444444444',
+        password: 'Test@1234'
+      });
+    const token = registerRes.body.token;
+
+    const res = await request(app)
+      .post('/api/transactions')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        amount: 500,
+        currency: 'USD'
+      });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('should return 404 for non existent transaction verify', async () => {
+    const empRes = await request(app)
+      .post('/api/employee/login')
+      .send({
+        username: 'test_employee',
+        password: 'Employee@123'
+      });
+    const token = empRes.body.token;
+
+    const res = await request(app)
+      .patch('/api/transactions/000000000000000000000000/verify')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toBe(404);
+  });
+
+});
+});
 
 });
 
